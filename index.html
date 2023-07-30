@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saturdays in a Month</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #282c34;
+      color: #fff;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 170vh;
+      margin: 0;
+    }
+
+    .calendar {
+      max-width: 600px;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #6ec5ff;
+    }
+
+    .current-date {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .month-container {
+      margin-bottom: 20px;
+    }
+
+    .month {
+      background-color: #333;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .month-name {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #6ec5ff;
+    }
+
+    .saturday-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 5px;
+    }
+
+    .saturday {
+      font-size: 18px;
+    }
+
+    .days-left {
+      font-size: 14px;
+      color: #888;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar">
+    <h1>Saturdays in a Month</h1>
+    <div class="current-date" id="current-date"></div>
+    <div class="months-container" id="months-container"></div>
+  </div>
+  <script>
+    function formatDate(date) {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    function getSaturdaysInMonth(year, month) {
+      const firstDay = new Date(year, month, 1);
+      const dayOfWeek = firstDay.getDay();
+      const firstSaturday = dayOfWeek <= 6 ? 7 - dayOfWeek : 14 - dayOfWeek;
+
+      const secondSaturday = firstSaturday + 7;
+      const fourthSaturday = firstSaturday + 21;
+
+      const secondSaturdayDate = new Date(year, month, secondSaturday);
+      const fourthSaturdayDate = new Date(year, month, fourthSaturday);
+
+      return [secondSaturdayDate, fourthSaturdayDate];
+    }
+
+    function getDaysLeft(date) {
+      const today = new Date();
+      const timeDiff = date - today;
+      const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+      return daysLeft;
+    }
+
+    function generateCalendar() {
+      const currentDateElem = document.getElementById('current-date');
+      const today = new Date();
+      currentDateElem.textContent = `Today: ${formatDate(today)} (${today.toLocaleString('default', { weekday: 'long' })})`;
+
+      const monthsContainer = document.getElementById('months-container');
+      let content = '';
+
+      for (let i = today.getMonth(); i < 12; i++) {
+        const [secondSaturday, fourthSaturday] = getSaturdaysInMonth(today.getFullYear(), i);
+        const monthName = new Date(today.getFullYear(), i, 1).toLocaleString('default', { month: 'long' });
+
+        if (secondSaturday >= today) {
+          const daysLeftForSecondSaturday = getDaysLeft(secondSaturday);
+          const daysLeftForFourthSaturday = getDaysLeft(fourthSaturday);
+
+          content += `
+            <div class="month">
+              <div class="month-name">${monthName}</div>
+              <div class="saturday-container">
+                <div class="saturday">${formatDate(secondSaturday)}</div>
+                <div class="days-left">(${daysLeftForSecondSaturday} days left)</div>
+              </div>
+              <div class="saturday-container">
+                <div class="saturday">${formatDate(fourthSaturday)}</div>
+                <div class="days-left">(${daysLeftForFourthSaturday} days left)</div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      monthsContainer.innerHTML = content;
+    }
+
+    generateCalendar();
+  </script>
+</body>
+</html>
